@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
 import { CommonUtils } from "../utils/common-utils";
+import { loginSelectors } from "./selectors/login.selectors";
 
 export class LoginPage {
   readonly page: Page;
@@ -12,15 +13,9 @@ export class LoginPage {
 
     // These are common selector patterns for login forms.
     // Update them if your application uses different attributes.
-    this.usernameInput = page.locator(
-      'input[name="username"], input[id="username"], input[type="email"]'
-    );
-    this.passwordInput = page.locator(
-      'input[name="password"], input[id="password"], input[type="password"]'
-    );
-    this.submitButton = page.locator(
-      'button[type="submit"], button:has-text("Login"), button:has-text("Sign in")'
-    );
+    this.usernameInput = page.locator(loginSelectors.usernameInput);
+    this.passwordInput = page.locator(loginSelectors.passwordInput);
+    this.submitButton = page.locator(loginSelectors.submitButton);
   }
 
   async navigateToLogin(): Promise<void> {
