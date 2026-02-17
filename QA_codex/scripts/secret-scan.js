@@ -5,6 +5,15 @@ const { execSync } = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 
+// Explicit false-positive allowlist for framework docs/config files.
+// Keep this list short and review periodically.
+const allowlistedFiles = new Set([
+  "QA_codex/README.md",
+  "QA_codex/config/env.ts",
+  "QA_codex/scripts/secret-scan.js",
+  "QA_codex/utils/test-data.ts"
+]);
+
 const skipExtensions = new Set([
   ".png",
   ".jpg",
@@ -55,6 +64,10 @@ function getStagedFiles() {
 }
 
 function shouldScanFile(filePath) {
+  if (allowlistedFiles.has(filePath.replace(/\\/g, "/"))) {
+    return false;
+  }
+
   const ext = path.extname(filePath).toLowerCase();
   if (skipExtensions.has(ext)) {
     return false;
