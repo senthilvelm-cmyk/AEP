@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -e
+
+echo "[pre-commit] Running secret scan on staged changes..."
+cd QA_codex
+npm run scan:secrets
