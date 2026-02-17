@@ -5,13 +5,17 @@ import { merchandiseSelectors } from "./selectors/merchandise.selectors";
 
 export class MerchandisePage {
   readonly page: Page;
+  readonly productCardLinks: Locator;
   readonly pickFromStoreText: Locator;
   readonly pickFromStoreIcon: Locator;
 
   constructor(page: Page) {
     this.page = page;
+    this.productCardLinks = page.locator(merchandiseSelectors.productCardLink);
     this.pickFromStoreText = page.locator(merchandiseSelectors.pickFromStoreText);
-    this.pickFromStoreIcon = page.locator(merchandiseSelectors.pickFromStoreIcon);
+    this.pickFromStoreIcon = page.locator(
+      merchandiseSelectors.pickFromStoreIconInProductCard
+    );
   }
 
   async navigateToMerchandisePage(): Promise<void> {
@@ -59,6 +63,8 @@ export class MerchandisePage {
   }
 
   async getPickFromStoreIndicatorCountOnUi(): Promise<number> {
+    await expect(this.productCardLinks.first()).toBeVisible({ timeout: 15000 });
+
     const textCount = await this.pickFromStoreText.evaluateAll((nodes) =>
       nodes.filter((node) => {
         const element = node as HTMLElement;
@@ -107,13 +113,8 @@ export class MerchandisePage {
   }
 
   private isRelevantMerchandiseResponse(response: Response): boolean {
-    const url = response.url().toLowerCase();
-    return (
-      url.includes("merchandise") ||
-      url.includes("product") ||
-      url.includes("catalog") ||
-      url.includes("fulfillment")
-    );
+    const resourceType = response.request().resourceType();
+    return resourceType === "xhr" || resourceType === "fetch";
   }
 
   private async getFulfillmentMethodCountFromSingleResponse(
