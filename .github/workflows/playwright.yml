@@ -1,0 +1,121 @@
+name: Playwright QA_codex CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Sensitive values are injected at runtime from GitHub Secrets.
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      LOGIN_USERNAME: ${{ secrets.LOGIN_USERNAME }}
+      LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+      API_TOKEN: ${{ secrets.API_TOKEN }}
+      API_AUTH_SCHEME: ${{ secrets.API_AUTH_SCHEME }}
+      ENABLE_ARTIFACTS: "true"
+
+    defaults:
+      run:
+        working-directory: QA_codex
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: QA_codex/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run UI Playwright tests
+        run: npx playwright test tests/ui
+
+      - name: Upload UI Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-ui
+          path: QA_codex/playwright-report/
+          retention-days: 7
+
+      - name: Upload UI test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-ui
+          path: QA_codex/test-results/
+          retention-days: 7
+
+  api-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Sensitive values are injected at runtime from GitHub Secrets.
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      LOGIN_USERNAME: ${{ secrets.LOGIN_USERNAME }}
+      LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+      API_TOKEN: ${{ secrets.API_TOKEN }}
+      API_AUTH_SCHEME: ${{ secrets.API_AUTH_SCHEME }}
+      ENABLE_ARTIFACTS: "true"
+
+    defaults:
+      run:
+        working-directory: QA_codex
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: QA_codex/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run API Playwright tests
+        run: npx playwright test tests/api
+
+      - name: Upload API Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-api
+          path: QA_codex/playwright-report/
+          retention-days: 7
+
+      - name: Upload API test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-api
+          path: QA_codex/test-results/
+          retention-days: 7

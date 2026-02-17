@@ -113,3 +113,22 @@ git config core.hooksPath QA_codex/.githooks
 ```
 
 After this, every `git commit` runs the scan first and rejects commits with potential secret patterns.
+
+## CI Pipeline (GitHub Actions)
+
+Workflow file:
+
+```text
+.github/workflows/playwright.yml
+```
+
+It runs Playwright tests from `QA_codex` on push/PR and uploads report artifacts.
+
+Add these GitHub repository secrets before running CI:
+
+- `BASE_URL`
+- `API_BASE_URL`
+- `LOGIN_USERNAME`
+- `LOGIN_PASSWORD`
+- `API_TOKEN`
+- `API_AUTH_SCHEME` (example: `Bearer`)
